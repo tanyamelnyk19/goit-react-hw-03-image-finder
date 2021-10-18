@@ -13,6 +13,9 @@ class App extends Component {
     page: 1,
     searchResults: [],
     loader: false,
+    showModal: false,
+    largeImageURL: '',
+    tags: '',
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -53,22 +56,40 @@ class App extends Component {
     });
   };
 
+  toggleModal = () => {
+    this.setState({ showModal: !this.state.showModal });
+  };
+
+  handleImageClick = ({ largeImageURL, tags }) => {
+    this.setState({ largeImageURL, tags });
+    this.toggleModal();
+  };
+
   render() {
-    const { loader, searchResults, query } = this.state;
+    const { loader, searchResults, query, showModal, largeImageURL, tags } =
+      this.state;
+    const { getQuery, handleImageClick, handleButtonLoadMore, toggleModal } =
+      this;
     return (
       <div className="App">
-        <Searchbar getQuery={this.getQuery} />
-        {/* {loader && <MyLoader/>} */}
+        <Searchbar getQuery={getQuery} />
         {searchResults.length > 0 ? (
-          <ImageGallery searchResults={searchResults} />
+          <ImageGallery
+            searchResults={searchResults}
+            handleImageClick={handleImageClick}
+          />
         ) : (
           query !== '' && !loader && <p className="noResult">No results😟</p>
         )}
         {searchResults.length > 0 && !loader && (
-          <Button handleButtonLoadMore={this.handleButtonLoadMore} />
+          <Button handleButtonLoadMore={handleButtonLoadMore} />
         )}
         {loader && <MyLoader />}
-        <Modal />
+        {showModal && (
+          <Modal toggleModal={toggleModal}>
+            <img src={largeImageURL} alt={tags} />
+          </Modal>
+        )}
       </div>
     );
   }
